@@ -19,7 +19,7 @@ if todolist_entity_id is not None:
         if "due" in goal and goal["status"] == "needs_action":
             # two different ways to define datetime
             try:
-                goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M%S%z")
+                goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
             except ValueError:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
             if current_time > goal_due:
@@ -39,10 +39,11 @@ if todolist_entity_id is not None:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
             continue
         # changing description 
-        description = f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days)
-        description += '\n'.join(initial_description)
+        description = '\n'.join(initial_description)
+        description += f"\nError Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days)
+        
         logger.warning(description)
-        service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "due_date": current_time.strftime("%Y-%m-%d"), description: description}
+        service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "due_date": current_time.strftime("%Y-%m-%d"), "description": description}
         hass.services.call("todo", "update_item", service_data, False)
 
         
