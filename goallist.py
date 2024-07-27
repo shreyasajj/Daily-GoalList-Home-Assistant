@@ -60,7 +60,7 @@ if todolist_entity_id is not None:
                 if "Error Budget Left" in line:
                     error_budget_left = getNumber(line)
                 elif "Total Error Budget" in line:
-                    total_error_budget = 5
+                    total_error_budget = getNumber(line)
                 elif "Remaining Days" in line:
                     continue
                 else:
