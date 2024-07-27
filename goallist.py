@@ -40,7 +40,7 @@ if todolist_entity_id is not None:
             continue
         # changing description 
         description = f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days)
-        description += '\n'.join(description)
+        description += '\n'.join(initial_description)
         logger.warning(description)
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "due_date": current_time.strftime("%Y-%m-%d"), description: description}
         hass.services.call("todo", "update_item", service_data, False)
