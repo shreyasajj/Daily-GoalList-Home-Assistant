@@ -1,13 +1,29 @@
 todolist_entity_id = data.get("entity_id")
 current_time = datetime.datetime.now()
-reset_window = 7
+reset_window = data.get("reset_window", "7")
+if reset_window.isdigit():
+    reset_window = int(reset_window)
+else:
+    logger.error("\"reset_window\" need to be a number")
+    exit(1)
 
 def getNumber(searchstring):
-    digits = ''.join(x for x in searchstring if x.isdigit())
-    if digits:
-        return int(digits)
-    else:
-        return None
+    digit = None
+    negative = 1
+    for s in searchstring:
+        if s.isdigit():
+            if digit is None:
+                digit = s
+            else:
+                digit += s
+        elif s == "-":
+            digit = "-"
+        else:
+            if digit:
+                break
+    if digit == "-":
+        digit = None
+    return None
 
 # def failedGoalHelper(reset_window, failed_activies):
 #     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
@@ -86,6 +102,7 @@ if todolist_entity_id is not None:
         
         # changing description 
         description = '\n'.join(final_description)
+        logger.info(description)
         description += f"\nError Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days)
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
