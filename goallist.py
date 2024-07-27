@@ -24,13 +24,13 @@ def getNumber(searchstring):
         return None
     return int(digit)
 
-# def failedGoalHelper(reset_window, failed_activies):
-#     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
-#     for i in range(len(failed_goals)):
-#         if not i == len(failed_goals)-1:
-#             output_string+= ", "+failed_goals[i]
-#         else:
-#             output_string+= ", and "+failed_goals
+def failedGoalHelper(reset_window, failed_activies):
+    output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
+    for i in range(len(failed_goals)):
+        if not i == len(failed_goals)-1:
+            output_string+= ", "+failed_goals[i]
+        else:
+            output_string+= ", and "+failed_goals
 
 if todolist_entity_id is not None:
     # Get all todolist items
@@ -70,7 +70,6 @@ if todolist_entity_id is not None:
             logger.info(f"Found a number for %s in the description setting the error budget and total error budget" % (goal["summary"]))
         else:
             #else find "Error Budget Left" and "Total Error Budget" and get the raw description out
-            
             for line in initial_description:
                 if "Error Budget Left" in line:
                     error_budget_left = getNumber(line)
@@ -87,7 +86,7 @@ if todolist_entity_id is not None:
 
         # deduct penalities
         if penalize:
-            error_budget_left -=1
+            error_budget_left -= 1
             logger.info(f"%s was passed the due date...Subtracting from error budget. Error budget is now %d" % (goal["summary"], error_budget_left))
             if error_budget_left == 0:
                 failed_goals = True
@@ -100,15 +99,14 @@ if todolist_entity_id is not None:
             logger.info(f"%s: Setting error budget to total_error_budget as reset window was hit" % (goal["summary"]))
         
         # changing description 
+        final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         description = '\n'.join(final_description)
-        logger.info(description)
-        description += f"\nError Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days)
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
 
-    # if failed_goals:
-    #     output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
-    # output["failed_goals"] = failed_goals
+    if failed_goals:
+        output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
+    output["failed_goals"] = failed_goals
 
         
 
