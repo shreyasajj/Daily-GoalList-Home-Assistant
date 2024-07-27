@@ -39,15 +39,17 @@ if todolist_entity_id is not None:
             final_description = initial_description
         else:
             #else find "Error Budget Left" and "Total Error Budget" and get the raw description out
+            
             for line in initial_description:
                 if "Error Budget Left" in line:
-                    error_budget_left = get_int(line)
+                    error_budget_left = getNumber(line)
                 elif "Total Error Budget" in line:
-                    total_error_budget = get_int(line)
+                    total_error_budget = getNumber(line)
                 elif "Remaining Days" in line:
                     continue
                 else:
                     final_description.append(line)
+        logger.info(final_description)
         # if error_budget_left or total_error_budget is missing skip
         if not error_budget_left or not total_error_budget:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
@@ -70,19 +72,19 @@ if todolist_entity_id is not None:
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "due_date": current_time.strftime("%Y-%m-%d"), "description": description}
         hass.services.call("todo", "update_item", service_data, False)
 
-        if failed_goals:
-            output["failed_goals_val"] = failed_goal_helper(reset_window, failed_goals_val)
-        output["failed_goals"] = failed_goals
+        # if failed_goals:
+        #     output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
+        # output["failed_goals"] = failed_goals
 
         
-def get_int(searchstring):
+def getNumber(searchstring):
     digits = ''.join(x for x in r if x.isdigit())
     if digits:
         return int(s)
     else:
         return None
 
-def failed_goal_helper(reset_window, failed_activies):
+def failedGoalHelper(reset_window, failed_activies):
     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
     for i in range(len(failed_goals)):
         if not i == len(failed_goals)-1:
