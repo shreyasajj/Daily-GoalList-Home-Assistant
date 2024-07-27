@@ -21,7 +21,7 @@ if todolist_entity_id is not None:
             try:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M%S%z")
             except ValueError:
-                goal_due = atetime.datetime.strptime(goal["due"], "%Y-%m-%d")
+                goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
             if current_time > goal_due:
                 penalize = True
         
