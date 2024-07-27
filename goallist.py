@@ -5,7 +5,7 @@ reset_window = 7
 def getNumber(searchstring):
     digits = ''.join(x for x in searchstring if x.isdigit())
     if digits:
-        return int(s)
+        return int(digits)
     else:
         return None
 
