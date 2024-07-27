@@ -30,10 +30,10 @@ if todolist_entity_id is not None:
         error_budget_left = None
         total_error_budget = None
         remaining_days = reset_window - current_time.weekday()
-        if description[0].isdigit():
-            error_budget_left = int(description[0])
+        if initial_description[0].isdigit():
+            error_budget_left = int(initial_description[0])
             total_error_budget = error_budget_left
-            description.pop(0)
+            initial_description.pop(0)
         # if error_budget_left or total_error_budget is missing skip
         if not error_budget_left or not total_error_budget:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
