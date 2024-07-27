@@ -11,7 +11,7 @@ if todolist_entity_id is not None:
     # Loop through all items
     for goal in all_goals[todolist_entity_id]["items"]:
         # Skipping over values without description, summary, or status Not Supported
-        if not "description" in goal or not "status" in goal or len(goal["description"]) > 0:
+        if not "description" in goal or not "status" in goal or not len(goal["description"]) > 0:
             logger.info("Skipping "+ goal["summary"] + " has no \"description\"/\"status\"")
             continue
         # Penalize goals passed dues 
