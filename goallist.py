@@ -42,9 +42,9 @@ if todolist_entity_id is not None:
             
             for line in initial_description:
                 if "Error Budget Left" in line:
-                    error_budget_left = getNumber(line)
+                    error_budget_left = 5
                 elif "Total Error Budget" in line:
-                    total_error_budget = getNumber(line)
+                    total_error_budget = 5
                 elif "Remaining Days" in line:
                     continue
                 else:
@@ -77,19 +77,19 @@ if todolist_entity_id is not None:
         # output["failed_goals"] = failed_goals
 
         
-def getNumber(searchstring):
-    digits = ''.join(x for x in r if x.isdigit())
-    if digits:
-        return int(s)
-    else:
-        return None
+# def getNumber(searchstring):
+#     digits = ''.join(x for x in r if x.isdigit())
+#     if digits:
+#         return int(s)
+#     else:
+#         return None
 
-def failedGoalHelper(reset_window, failed_activies):
-    output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
-    for i in range(len(failed_goals)):
-        if not i == len(failed_goals)-1:
-            output_string+= ", "+failed_goals[i]
-        else:
-            output_string+= ", and "+failed_goals
+# def failedGoalHelper(reset_window, failed_activies):
+#     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
+#     for i in range(len(failed_goals)):
+#         if not i == len(failed_goals)-1:
+#             output_string+= ", "+failed_goals[i]
+#         else:
+#             output_string+= ", and "+failed_goals
 
         
