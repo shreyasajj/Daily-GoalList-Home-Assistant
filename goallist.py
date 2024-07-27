@@ -9,7 +9,6 @@ else:
 
 def getNumber(searchstring):
     digit = None
-    negative = 1
     for s in searchstring:
         if s.isdigit():
             if digit is None:
@@ -21,9 +20,9 @@ def getNumber(searchstring):
         else:
             if digit:
                 break
-    if digit == "-":
-        digit = None
-    return None
+    if digit == "-" or not digit:
+        return None
+    return int(digit)
 
 # def failedGoalHelper(reset_window, failed_activies):
 #     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
