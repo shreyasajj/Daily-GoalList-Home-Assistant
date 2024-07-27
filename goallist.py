@@ -3,7 +3,7 @@ current_time = datetime.datetime.now()
 reset_window = 7
 
 def getNumber(searchstring):
-    digits = ''.join(x for x in r if x.isdigit())
+    digits = ''.join(x for x in searchstring if x.isdigit())
     if digits:
         return int(s)
     else:
