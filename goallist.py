@@ -2,6 +2,21 @@ todolist_entity_id = data.get("entity_id")
 current_time = datetime.datetime.now()
 reset_window = 7
 
+def getNumber(searchstring):
+    digits = ''.join(x for x in r if x.isdigit())
+    if digits:
+        return int(s)
+    else:
+        return None
+
+# def failedGoalHelper(reset_window, failed_activies):
+#     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
+#     for i in range(len(failed_goals)):
+#         if not i == len(failed_goals)-1:
+#             output_string+= ", "+failed_goals[i]
+#         else:
+#             output_string+= ", and "+failed_goals
+
 if todolist_entity_id is not None:
     # Get all todolist items
     service_data = {"entity_id": todolist_entity_id}
@@ -80,19 +95,8 @@ if todolist_entity_id is not None:
     # output["failed_goals"] = failed_goals
 
         
-def getNumber(searchstring):
-    digits = ''.join(x for x in r if x.isdigit())
-    if digits:
-        return int(s)
-    else:
-        return None
 
-# def failedGoalHelper(reset_window, failed_activies):
-#     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
-#     for i in range(len(failed_goals)):
-#         if not i == len(failed_goals)-1:
-#             output_string+= ", "+failed_goals[i]
-#         else:
-#             output_string+= ", and "+failed_goals
+
+
 
         
