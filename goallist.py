@@ -130,6 +130,9 @@ if todolist_entity_id is not None:
             final_datetime = goal_due  + datetime.timedelta(days=1)
         elif not due_date_type == 0:
             final_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day, goal_due.hour, goal_due.minute, goal_due.second)
+            #it could be afternoon and the date is set for the morning instead
+            if final_datetime < current_time:
+                final_datetime = final_datetime + datetime.timedelta(days=1)
         
         #setting the new due date based on previous type
         if due_date_type == 0:
