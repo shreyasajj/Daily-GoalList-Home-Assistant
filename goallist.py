@@ -80,7 +80,7 @@ if todolist_entity_id is not None:
                 else:
                     final_description.append(line)
         # if error_budget_left or total_error_budget is missing skip
-        if not error_budget_left or not total_error_budget:
+        if not error_budget_left is None or not total_error_budget is None:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
             continue
 
@@ -100,6 +100,8 @@ if todolist_entity_id is not None:
         
         # changing description 
         final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
+        logger.log(len(final_description))
+        logger.log(final_description)
         description = '\n'.join(final_description)
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
