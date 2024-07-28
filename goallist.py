@@ -25,7 +25,7 @@ def getNumber(searchstring):
     return int(digit)
 
 def failedGoalHelper(reset_window, failed_goals):
-    output_string = f"Failed to accomplish these goals in %ddays: %s" % (reset_window, failed_goals[0])
+    output_string = f"Failed to accomplish these goals in %d days: %s" % (reset_window, failed_goals[0])
     for i in range(1, len(failed_goals)):
         if not i == len(failed_goals)-1:
             output_string+= ", "+failed_goals[i]
