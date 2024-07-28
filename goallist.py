@@ -80,7 +80,7 @@ if todolist_entity_id is not None:
                 else:
                     final_description.append(line)
         # if error_budget_left or total_error_budget is missing skip
-        if not error_budget_left is None or not total_error_budget is None:
+        if error_budget_left is None or total_error_budget is None:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
             continue
 
