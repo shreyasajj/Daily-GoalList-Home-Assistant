@@ -1,11 +1,7 @@
 todolist_entity_id = data.get("entity_id")
 current_time = datetime.datetime.now()
-reset_window = data.get("reset_window", "7")
-if reset_window.isdigit():
-    reset_window = int(reset_window)
-else:
-    logger.error("\"reset_window\" need to be a number")
-    exit(1)
+reset_window_input = data.get("reset_window", "weekly")
+
 
 def getNumber(searchstring):
     digit = None
@@ -33,6 +29,19 @@ def failedGoalHelper(reset_window, failed_goals):
             output_string+= ", and "+failed_goals[i]
     return output_string
 
+if reset_window_input == "daily":
+    reset_window = 1
+    remaining_days = 1
+
+elif reset_window_input == "weekly":
+    #reset on 
+    reset_window = 7
+    remaining_days = reset_window - current_time.weekday()
+else:
+    logger.warning("\"reset_window\" need to be \"daily\" or \"weekly\"")
+    exit(1)
+
+
 if todolist_entity_id is not None:
     # Get all todolist items
     service_data = {"entity_id": todolist_entity_id}
@@ -40,6 +49,7 @@ if todolist_entity_id is not None:
 
     failed_goals_val = []
     failed_goals = False
+    due_date_type = 1
     # Loop through all items
     for goal in all_goals[todolist_entity_id]["items"]:
         # Skipping over values without description, summary, or status Not Supported
@@ -54,13 +64,13 @@ if todolist_entity_id is not None:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
             except ValueError:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
+                due_date_type = 2
             if current_time > goal_due:
                 penalize = True
 
         initial_description = goal["description"].split("\n")
         error_budget_left = None
         total_error_budget = None
-        remaining_days = reset_window - current_time.weekday()
         final_description = []
         # Create a new goal template if it only contains a number and description
         if initial_description[0].isdigit():
@@ -102,9 +112,13 @@ if todolist_entity_id is not None:
         # changing description 
         final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         description = '\n'.join([x for x in final_description if x])
+
+        #creating due_date based on current version of date
+        logger.info(goal["due"])
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
-
+    
+    #output staus of goal
     if failed_goals:
         output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
     output["failed_goals"] = failed_goals
