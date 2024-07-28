@@ -123,14 +123,14 @@ if todolist_entity_id is not None:
         elif not goal_due is None:
             final_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day, goal_due.hour, goal_due.minute, goal_due.second)
         
-        logger.info(final_datetime.strftime(final_datetime.strftime("%Y-%m-%d")))
+        logger.info(f"%d-%d-d" % (final_datetime.year, final_datetime.month, final_datetime.day))
         #setting the new due date based on previous type
         if due_date_type == 0:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         elif due_date_type == 1:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_datetime": final_datetime.strftime("%Y-%m-%dT%H:%M:%S%z"),"item": goal["summary"], "description": description}
         elif due_date_type == 2:
-            service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_date": final_datetime.strftime("%Y-%m-%d"), "item": goal["summary"], "description": description}
+            service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_date": f"%d-%d-d" % (final_datetime.year, final_datetime.month, final_datetime.day), "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
