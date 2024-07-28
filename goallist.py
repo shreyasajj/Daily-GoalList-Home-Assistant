@@ -1,5 +1,6 @@
 todolist_entity_id = data.get("entity_id")
 current_time = datetime.datetime.now()
+current_time = current_time.replace(tzinfo=None)
 reset_window_input = data.get("reset_window", "weekly")
 
 
@@ -59,7 +60,6 @@ if todolist_entity_id is not None:
         # Penalize goals passed dues 
         penalize = False
         due_date_type = 0
-        goal_due = None
         if "due" in goal:
             # two different ways to define datetime
             try:
@@ -69,10 +69,14 @@ if todolist_entity_id is not None:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
                 goal_due = goal_due.replace(hour=23, minute=59, second=59)
                 due_date_type = 2
+            goal_due = goal_due.replace(tzinfo=None)
             if current_time > goal_due and goal["status"] == "needs_action":
                 logger.info(current_time)
                 logger.info(goal_due)
                 penalize = True
+            else:
+                due_date_type == 0
+            
 
         initial_description = goal["description"].split("\n")
         error_budget_left = None
@@ -121,9 +125,9 @@ if todolist_entity_id is not None:
 
         #creating due_date based on current version of date
         final_datetime = None
-        if not goal_due is None and goal_due.date() == current_time.date():
+        if not due_date_type == 0 and goal_due.date() == current_time.date():
             final_datetime = goal_due  + datetime.timedelta(days=1)
-        elif not goal_due is None:
+        elif not due_date_type == 0:
             final_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day, goal_due.hour, goal_due.minute, goal_due.second)
         
         #setting the new due date based on previous type
