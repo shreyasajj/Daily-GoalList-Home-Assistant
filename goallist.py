@@ -145,6 +145,8 @@ if todolist_entity_id is not None:
     if failed_goals:
         output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
     output["failed_goals"] = failed_goals
+else:
+    logger.warning("Did not provide a entity_id")
 
         
 
