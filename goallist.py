@@ -25,6 +25,7 @@ def getNumber(searchstring):
     return int(digit)
 
 def failedGoalHelper(reset_window, failed_goals):
+    logger.log(failed_goals)
     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
     for i in range(1, len(failed_goals)):
         if not i == len(failed_goals)-1:
@@ -100,8 +101,6 @@ if todolist_entity_id is not None:
         
         # changing description 
         final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
-        logger.info(len(final_description))
-        logger.info(final_description)
         description = '\n'.join([x for x in final_description if x])
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
