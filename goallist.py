@@ -53,6 +53,7 @@ if todolist_entity_id is not None:
     failed_goals = False
     # Loop through all items
     for goal in all_goals[todolist_entity_id]["items"]:
+        logger.info("Processing "+ goal["summary"])
         # Skipping over values without description, summary, or status Not Supported
         if not "description" in goal or not "status" in goal or not len(goal["description"]) > 0:
             logger.info("Skipping "+ goal["summary"] + " has no \"description\"/\"status\"")
