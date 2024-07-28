@@ -31,6 +31,7 @@ def failedGoalHelper(reset_window, failed_goals):
             output_string+= ", "+failed_goals[i]
         else:
             output_string+= ", and "+failed_goals[i]
+    return output_string
 
 if todolist_entity_id is not None:
     # Get all todolist items
