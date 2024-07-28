@@ -24,13 +24,13 @@ def getNumber(searchstring):
         return None
     return int(digit)
 
-def failedGoalHelper(reset_window, failed_activies):
+def failedGoalHelper(reset_window, failed_goals):
     output_string = "Failed to accomplish these goals in "+reset_window+": "+failed_goals[0]
-    for i in range(len(failed_goals)):
+    for i in range(1, len(failed_goals)):
         if not i == len(failed_goals)-1:
             output_string+= ", "+failed_goals[i]
         else:
-            output_string+= ", and "+failed_goals
+            output_string+= ", and "+failed_goals[i]
 
 if todolist_entity_id is not None:
     # Get all todolist items
