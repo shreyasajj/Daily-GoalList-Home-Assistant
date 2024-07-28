@@ -72,8 +72,6 @@ if todolist_entity_id is not None:
                 due_date_type = 2
             goal_due = goal_due.replace(tzinfo=None)
             if current_time > goal_due and goal["status"] == "needs_action":
-                logger.info(current_time)
-                logger.info(goal_due)
                 penalize = True
             else:
                 due_date_type == 0
