@@ -102,7 +102,7 @@ if todolist_entity_id is not None:
         final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         logger.info(len(final_description))
         logger.info(final_description)
-        description = '\n'.join(final_description)
+        description = '\n'.join(list(filter(None, final_description)))
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
 
