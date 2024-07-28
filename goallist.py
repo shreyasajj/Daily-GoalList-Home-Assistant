@@ -3,6 +3,7 @@ current_time = datetime.datetime.now()
 reset_window_input = data.get("reset_window", "weekly")
 
 
+
 def getNumber(searchstring):
     digit = None
     for s in searchstring:
@@ -49,7 +50,6 @@ if todolist_entity_id is not None:
 
     failed_goals_val = []
     failed_goals = False
-    due_date_type = 1
     # Loop through all items
     for goal in all_goals[todolist_entity_id]["items"]:
         # Skipping over values without description, summary, or status Not Supported
@@ -58,10 +58,12 @@ if todolist_entity_id is not None:
             continue
         # Penalize goals passed dues 
         penalize = False
+        due_date_type = 0
         if "due" in goal and goal["status"] == "needs_action":
             # two different ways to define datetime
             try:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
+                due_date_type = 1
             except ValueError:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
                 due_date_type = 2
@@ -114,7 +116,9 @@ if todolist_entity_id is not None:
         description = '\n'.join([x for x in final_description if x])
 
         #creating due_date based on current version of date
-        logger.info(goal["due"])
+        #if due_date_type == 0:
+        #    current_time+=
+        logger.info(goal_due.date())
         service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
     
