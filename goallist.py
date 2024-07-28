@@ -59,6 +59,7 @@ if todolist_entity_id is not None:
         # Penalize goals passed dues 
         penalize = False
         due_date_type = 0
+        goal_due = None
         if "due" in goal and goal["status"] == "needs_action":
             # two different ways to define datetime
             try:
@@ -116,10 +117,19 @@ if todolist_entity_id is not None:
         description = '\n'.join([x for x in final_description if x])
 
         #creating due_date based on current version of date
-        #if due_date_type == 0:
-        #    current_time+=
-        logger.info(goal_due.date())
-        service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
+        final_datetime = None
+        if not goal_due is None and goal_due.date() == current_time.date():
+            final_datetime = goal_due  + datetime.timedelta(day=1)
+        elif not goal_due is None:
+            final_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day, goal_due.hour, goal_due.minute, goal_due.second)
+        
+        #setting the new due date based on previous type
+        if due_date_type == 0:
+            service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "item": goal["summary"], "description": description}
+        elif due_date_type == 1:
+            service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_datetime": final_datetime.strftime("%Y-%m-%dT%H:%M:%S%z"),"item": goal["summary"], "description": description}
+        elif due_date_type == 2:
+            service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_date": final_datetime.strftime("%Y-%m-%d"),"item": goal["summary"], "description": description}
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
