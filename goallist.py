@@ -23,12 +23,26 @@ def getNumber(searchstring):
     return int(digit)
 
 def failedGoalHelper(reset_window, failed_goals):
+    if not failed_goals:
+        return False
     output_string = f"Failed to accomplish these goals in %d days: %s" % (reset_window, failed_goals[0])
     for i in range(1, len(failed_goals)):
         if not i == len(failed_goals)-1:
             output_string+= ", "+failed_goals[i]
         else:
             output_string+= ", and "+failed_goals[i]
+    return output_string
+
+def end_of_week_report_helper(end_of_week_report):
+    if not end_of_week_report:
+        return False
+    output_string = "**This is the end of week report**"
+    for name, report in end_of_week_report:
+        output_string+= f"\n**%s**" % (name)
+        if not report:
+            output_string += "\nNo Report"
+        else:
+            output_string += f"\n%s" % (report)
     return output_string
 
 if reset_window_input == "daily":
@@ -48,9 +62,8 @@ if todolist_entity_id is not None:
     # Get all todolist items
     service_data = {"entity_id": todolist_entity_id}
     all_goals = hass.services.call("todo", "get_items", service_data, blocking=True, return_response=True)
-
-    failed_goals_val = []
-    failed_goals = False
+    end_of_week_report = {}
+    failed_goals = []
     # Loop through all items
     for goal in all_goals[todolist_entity_id]["items"]:
         logger.info("Processing "+ goal["summary"])
@@ -90,13 +103,20 @@ if todolist_entity_id is not None:
             logger.info(f"Found a number for %s in the description setting the error budget and total error budget" % (goal["summary"]))
         else:
             #else find "Error Budget Left" and "Total Error Budget" and get the raw description out
+            today_work_notes = []
+            end_of_work_notes = False
             for line in initial_description:
                 if "Error Budget Left" in line:
                     error_budget_left = getNumber(line)
+                    end_of_work_notes = True
                 elif "Total Error Budget" in line:
                     total_error_budget = getNumber(line)
+                    end_of_work_notes = True
                 elif "Remaining Days" in line:
+                    end_of_work_notes = True
                     continue
+                elif not end_of_work_notes:
+                    today_work_notes.append(line)
                 else:
                     final_description.append(line)
         # if error_budget_left or total_error_budget is missing skip
@@ -104,22 +124,27 @@ if todolist_entity_id is not None:
             logger.info(f"No \"Error Budget Left\" or \"Total Error Budget\" found in description for %s, skipping" % (goal["summary"]))
             continue
 
-        # deduct penalities
+        # deduct penalities/set work notes descrition
         if penalize:
             error_budget_left -= 1
+            final_description.append(f"[%d/%d/%d] Skipped" % (final_datetime.month, final_datetime.day, final_datetime.year))
             logger.info(f"%s was passed the due date...Subtracting from error budget. Error budget is now %d" % (goal["summary"], error_budget_left))
             if error_budget_left == 0:
-                failed_goals = True
-                failed_goals_val.append(goal["summary"])
+                failed_goals.append(goal["summary"])
                 logger.info(f"Error budget for %s is 0, adding it to the failed_goals" % (goal["summary"]))
+        elif today_work_notes:
+            final_description.append(f"[%d/%d/%d] %s" % (final_datetime.month, final_datetime.day, final_datetime.year, '\n'.join([x for x in today_work_notes if x])))
+        else:
+            final_description.append(f"[%d/%d/%d] No work notes for today" % (final_datetime.month, final_datetime.day, final_datetime.year))
         
-        # reset error budget
+        # reset error budget/outputing all work notes for end of the week report
         if remaining_days == reset_window:
             error_budget_left = total_error_budget
             logger.info(f"%s: Setting error budget to total_error_budget as reset window was hit" % (goal["summary"]))
+            end_of_week_report[goal["summary"]] = '\n'.join([x for x in final_description if x])
         
         # changing description 
-        final_description.append(f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
+        final_description.insert(0,f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         description = '\n'.join([x for x in final_description if x])
 
         #creating due_date based on current version of date
@@ -142,9 +167,9 @@ if todolist_entity_id is not None:
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
-    if failed_goals:
-        output["failed_goals_val"] = failedGoalHelper(reset_window, failed_goals_val)
-    output["failed_goals"] = failed_goals
+    output["failed_goals"] = failedGoalHelper(reset_window, failed_goals_val)
+    output["end_of_week_report"] = end_of_week_report_helper(end_of_week_report)
+    
 else:
     logger.warning("Did not provide a entity_id")
 
