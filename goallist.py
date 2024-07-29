@@ -164,9 +164,12 @@ if todolist_entity_id is not None:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_datetime": f"%d-%d-%d %d:%d:%d" % (final_datetime.year, final_datetime.month, final_datetime.day, final_datetime.hour, final_datetime.minute, final_datetime.second),"item": goal["summary"], "description": description}
         elif due_date_type == 2:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_date": f"%d-%d-%d" % (final_datetime.year, final_datetime.month, final_datetime.day), "item": goal["summary"], "description": description}
+        logger.info(service_data)
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
+    logger.info(failedGoalHelper(reset_window, failed_goals))
+    logger.info(end_of_week_report_helper(end_of_week_report))
     output["failed_goals"] = failedGoalHelper(reset_window, failed_goals)
     output["end_of_week_report"] = end_of_week_report_helper(end_of_week_report)
 
