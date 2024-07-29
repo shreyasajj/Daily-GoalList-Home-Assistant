@@ -127,15 +127,15 @@ if todolist_entity_id is not None:
         # deduct penalities/set work notes descrition
         if penalize:
             error_budget_left -= 1
-            final_description.append(f"[%d/%d/%d] Skipped" % (final_datetime.month, final_datetime.day, final_datetime.year))
+            final_description.append(f"[%d/%d/%d] Skipped" % (current_time.month, current_time.day, current_time.year))
             logger.info(f"%s was passed the due date...Subtracting from error budget. Error budget is now %d" % (goal["summary"], error_budget_left))
             if error_budget_left == 0:
                 failed_goals.append(goal["summary"])
                 logger.info(f"Error budget for %s is 0, adding it to the failed_goals" % (goal["summary"]))
         elif today_work_notes:
-            final_description.append(f"[%d/%d/%d] %s" % (final_datetime.month, final_datetime.day, final_datetime.year, '\n'.join([x for x in today_work_notes if x])))
+            final_description.append(f"[%d/%d/%d] %s" % (current_time.month, current_time.day, current_time.year, '\n'.join([x for x in today_work_notes if x])))
         else:
-            final_description.append(f"[%d/%d/%d] No work notes for today" % (final_datetime.month, final_datetime.day, final_datetime.year))
+            final_description.append(f"[%d/%d/%d] No work notes for today" % (current_time.month, current_time.day, current_time.year))
         
         # reset error budget/outputing all work notes for end of the week report
         if remaining_days == reset_window:
@@ -169,7 +169,7 @@ if todolist_entity_id is not None:
     #output staus of goal
     output["failed_goals"] = failedGoalHelper(reset_window, failed_goals_val)
     output["end_of_week_report"] = end_of_week_report_helper(end_of_week_report)
-    
+
 else:
     logger.warning("Did not provide a entity_id")
 
