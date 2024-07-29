@@ -167,7 +167,7 @@ if todolist_entity_id is not None:
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
-    output["failed_goals"] = failedGoalHelper(reset_window, failed_goals_val)
+    output["failed_goals"] = failedGoalHelper(reset_window, failed_goals)
     output["end_of_week_report"] = end_of_week_report_helper(end_of_week_report)
 
 else:
