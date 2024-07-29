@@ -142,9 +142,10 @@ if todolist_entity_id is not None:
             error_budget_left = total_error_budget
             logger.info(f"%s: Setting error budget to total_error_budget as reset window was hit" % (goal["summary"]))
             end_of_week_report[goal["summary"]] = '\n'.join([x for x in final_description if x])
+            final_description = []
         
         # changing description 
-        final_description.insert(0,f"Error Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
+        final_description.insert(0,f"\nError Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         description = '\n'.join([x for x in final_description if x])
 
         #creating due_date based on current version of date
