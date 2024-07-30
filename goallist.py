@@ -89,7 +89,7 @@ if todolist_entity_id is not None:
             if current_time > goal_due and goal["status"] == "needs_action":
                 penalize = True
             else:
-                due_date_type == 0
+                due_date_type = 0
             
 
         initial_description = goal["description"].split("\n")
