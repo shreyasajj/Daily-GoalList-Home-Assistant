@@ -68,28 +68,29 @@ if todolist_entity_id is not None:
     for goal in all_goals[todolist_entity_id]["items"]:
         logger.info("Processing "+ goal["summary"])
         # Skipping over values without description, summary, or status Not Supported
-        if not "description" in goal or not "status" in goal or not len(goal["description"]) > 0:
-            logger.info("Skipping "+ goal["summary"] + " has no \"description\"/\"status\"")
+        if not "description" in goal or not "status" in goal or not "due" in globals or not len(goal["description"]) > 0:
+            logger.info("Skipping "+ goal["summary"] + " has no \"description\"/\"status\"/\"due\"")
             continue
         # Penalize goals passed dues 
         penalize = False
         due_date_type = 0
-        if "due" in goal:
-            # two different ways to define datetime
-            try:
-                goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
-                logger.debug(f"Found the current date as datetime %s" %(goal_due))
-                due_date_type = 1
-            except ValueError:
-                goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
-                goal_due = goal_due.replace(hour=23, minute=59, second=59)
-                logger.debug(f"Found the current date as date %s" %(goal_due))
-                due_date_type = 2
-            goal_due = goal_due.replace(tzinfo=None)
-            if current_time > goal_due and goal["status"] == "needs_action":
-                penalize = True
-            else:
-                due_date_type = 0
+        # two different ways to define datetime
+        try:
+            goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
+            logger.debug(f"Found the current date as datetime %s" %(goal_due))
+            due_date_type = 1
+        except ValueError:
+            goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
+            goal_due = goal_due.replace(hour=23, minute=59, second=59)
+            logger.debug(f"Found the current date as date %s" %(goal_due))
+            due_date_type = 2
+        goal_due = goal_due.replace(tzinfo=None)
+        if current_time > goal_due and goal["status"] == "needs_action":
+            logger.debug(f"Time due is less than the current time %s %s" %(goal_due, current_time))
+            penalize = True 
+        else:
+            logger.debug(f"Time due is greater than the current time %s %s, ignoring this time" %(goal_due, current_time))
+            due_date_type = 0
             
 
         initial_description = goal["description"].split("\n")
