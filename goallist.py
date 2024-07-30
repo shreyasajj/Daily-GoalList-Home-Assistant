@@ -78,10 +78,12 @@ if todolist_entity_id is not None:
             # two different ways to define datetime
             try:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%dT%H:%M:%S%z")
+                logger.debug(f"Found the current date as datetime %s" %(goal_due))
                 due_date_type = 1
             except ValueError:
                 goal_due = datetime.datetime.strptime(goal["due"], "%Y-%m-%d")
                 goal_due = goal_due.replace(hour=23, minute=59, second=59)
+                logger.debug(f"Found the current date as date %s" %(goal_due))
                 due_date_type = 2
             goal_due = goal_due.replace(tzinfo=None)
             if current_time > goal_due and goal["status"] == "needs_action":
@@ -108,14 +110,17 @@ if todolist_entity_id is not None:
             for line in initial_description:
                 if "Error Budget Left" in line:
                     error_budget_left = getNumber(line)
+                    logger.debug(f"Found the Error Budget Left = %s" %(error_budget_left))
                     end_of_work_notes = True
                 elif "Total Error Budget" in line:
                     total_error_budget = getNumber(line)
+                    logger.debug(f"Found the Total Error Budget = %s" %(total_error_budget))
                     end_of_work_notes = True
                 elif "Remaining Days" in line:
+                    logger.debug(f"Found the Remaining Days")
                     end_of_work_notes = True
                     continue
-                elif not end_of_work_notes:
+                elif line and not end_of_work_notes:
                     today_work_notes.append(line)
                 else:
                     final_description.append(line)
@@ -142,21 +147,26 @@ if todolist_entity_id is not None:
             error_budget_left = total_error_budget
             logger.info(f"%s: Setting error budget to total_error_budget as reset window was hit" % (goal["summary"]))
             end_of_week_report[goal["summary"]] = '\n'.join([x for x in final_description if x])
+            logger.debug(f"This is the end of the week report %s" % (end_of_week_report))
             final_description = []
         
         # changing description 
         final_description.insert(0,f"\nError Budget Left: %d\nTotal Error Budget: %d\nRemaining Days: %d\n" % (error_budget_left, total_error_budget, remaining_days))
         description = '\n'.join([x for x in final_description if x])
+        logger.debug(f"The final description is %s" % (description))
 
         #creating due_date based on current version of date
         final_datetime = None
         if not due_date_type == 0 and goal_due.date() == current_time.date():
             final_datetime = goal_due  + datetime.timedelta(days=1)
+            logger.debug(f"Added one day to the final time because the due date and the current are the same %s" % (final_datetime))
         elif not due_date_type == 0:
             final_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day, goal_due.hour, goal_due.minute, goal_due.second)
+            logger.debug(f"Set final datetime to %s" % (final_datetime))
             #it could be afternoon and the date is set for the morning instead
             if final_datetime < current_time:
                 final_datetime = final_datetime + datetime.timedelta(days=1)
+                logger.debug(f"Final datetime was not greater than the current time, rectifing  %s" % (final_datetime))
         
         #setting the new due date based on previous type
         if due_date_type == 0:
@@ -166,6 +176,7 @@ if todolist_entity_id is not None:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_datetime": f"%d-%d-%d %d:%d:%d" % (final_datetime.year, final_datetime.month, final_datetime.day, final_datetime.hour, final_datetime.minute, final_datetime.second),"item": goal["summary"], "description": description}
         elif due_date_type == 2:
             service_data = {"entity_id": todolist_entity_id, "status":"needs_action", "due_date": f"%d-%d-%d" % (final_datetime.year, final_datetime.month, final_datetime.day), "item": goal["summary"], "description": description}
+        logger.debug(f"Service Call is %s" % (service_data))
         hass.services.call("todo", "update_item", service_data, False)
     
     #output staus of goal
